@@ -13,6 +13,7 @@ class App extends Component {
     };
 
     this.onSearchUpdate = this.onSearchUpdate.bind(this);
+    this.onSearch = this.onSearch.bind(this);
   }
 
   onSearchUpdate(event) {
@@ -22,7 +23,22 @@ class App extends Component {
   }
 
   onSearch() {
+    const searchString = this.state.searchValue;
 
+    fetch(`${searchURL}${searchString}`, {
+      mode: 'cors',
+      headers: {
+        'Access-Control-Allow-Origin':'*'
+      },
+      credentials: 'same-origin',
+    })
+      .then(result => result.toJson())
+      .then(result => {
+          this.setState({
+            searchResults: result,
+          });
+      })
+    ;
   }
 
   render() {
@@ -31,7 +47,8 @@ class App extends Component {
         <h1>Wikipedia Viewer</h1>
         <a href="https://en.wikipedia.org/wiki/Special:Random">Random article</a>
         <p>
-          <input type="text" placeholder="Search wikipedia" value={this.state.searchValue} onChange={onSearchUpdate}/>
+          <input type="text" placeholder="Search wikipedia" value={this.state.searchValue} onChange={this.onSearchUpdate}/>
+          <a onClick={this.onSearch}>search</a>
         </p>
       </div>
     );
