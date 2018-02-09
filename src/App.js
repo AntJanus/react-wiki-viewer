@@ -1,8 +1,11 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
+import { processResults } from './app/processResults';
 
 const searchURL = 'https://en.wikipedia.org/w/api.php?format=json&action=query&generator=search&gsrnamespace=0&gsrlimit=10&prop=pageimages|extracts&pilimit=max&exintro&explaintext&exsentences=1&exlimit=max&gsrsearch=';
+const pageURL = 'https://en.wikipedia.org/?curid=';
+
 
 class App extends Component {
   constructor(props) {
@@ -26,22 +29,37 @@ class App extends Component {
     const searchString = this.state.searchValue;
 
     fetch(`${searchURL}${searchString}`, {
-      mode: 'cors',
+      mode: 'no-cors',
       headers: {
-        'Access-Control-Allow-Origin':'*'
+        'Access-Control-Allow-Origin':'*',
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
       },
       credentials: 'same-origin',
     })
-      .then(result => result.toJson())
+      .then(result => result.json())
       .then(result => {
-          this.setState({
-            searchResults: result,
+          this.setState((prevState) => {
+            return Object.assign({}, prevState, {
+                searchResults: processResults(result),
+            });
           });
       })
     ;
   }
 
   render() {
+      console.log(this.state);
+    const resultElements = this.state.searchResults.map((result, i) => {
+      return (
+        <li key={i}>
+          <a href={pageURL + result.pageId}>
+            {result.title}
+          </a>
+        </li>
+      );
+    });
+
     return (
       <div className="App">
         <h1>Wikipedia Viewer</h1>
@@ -50,6 +68,9 @@ class App extends Component {
           <input type="text" placeholder="Search wikipedia" value={this.state.searchValue} onChange={this.onSearchUpdate}/>
           <a onClick={this.onSearch}>search</a>
         </p>
+        <ul>
+            {resultElements}
+        </ul>
       </div>
     );
   }
