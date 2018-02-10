@@ -28,14 +28,12 @@ class App extends Component {
   onSearch() {
     const searchString = this.state.searchValue;
 
-    fetch(`${searchURL}${searchString}`, {
-      mode: 'no-cors',
+    fetch(`https://cors-anywhere.herokuapp.com/${searchURL}${searchString}`, {
       headers: {
         'Access-Control-Allow-Origin':'*',
         'Accept': 'application/json',
         'Content-Type': 'application/json'
       },
-      credentials: 'same-origin',
     })
       .then(result => result.json())
       .then(result => {
